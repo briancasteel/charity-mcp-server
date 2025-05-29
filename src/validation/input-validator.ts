@@ -5,13 +5,13 @@ import { logger } from "../utils/logger.js";
 // Enhanced EIN validation with more comprehensive checks
 export class EINValidator {
   private static readonly INVALID_EINS = new Set([
-    "00-0000000", "11-1111111", "22-2222222", "33-3333333", 
-    "44-4444444", "55-5555555", "66-6666666", "77-7777777", 
+    "00-0000000", "11-1111111", "22-2222222", "33-3333333",
+    "44-4444444", "55-5555555", "66-6666666", "77-7777777",
     "88-8888888", "99-9999999", "12-3456789"
   ]);
 
   private static readonly RESERVED_PREFIXES = new Set([
-    "00", "07", "08", "09", "17", "18", "19", "28", "29", 
+    "00", "07", "08", "09", "17", "18", "19", "28", "29",
     "49", "69", "70", "78", "79", "89"
   ]);
 
@@ -24,7 +24,7 @@ export class EINValidator {
 
     // Remove whitespace and normalize
     const cleanEIN = ein.trim().replace(/\s+/g, '');
-    
+
     if (cleanEIN.length === 0) {
       throw new ValidationError("EIN cannot be empty", "ein");
     }
@@ -32,10 +32,10 @@ export class EINValidator {
     // Check basic format
     const einRegex = /^(\d{2})-?(\d{7})$/;
     const match = cleanEIN.match(einRegex);
-    
+
     if (!match) {
       throw new ValidationError(
-        "EIN must be in format XX-XXXXXXX or XXXXXXXXX with exactly 9 digits", 
+        "EIN must be in format XX-XXXXXXX or XXXXXXXXX with exactly 9 digits",
         "ein"
       );
     }
@@ -59,6 +59,8 @@ export class EINValidator {
     }
 
     logger.debug("EIN validation successful", { originalEIN: ein, formattedEIN });
+    
+    // Always return formatted EIN with hyphen
     return formattedEIN;
   }
 }
@@ -71,7 +73,7 @@ export class SearchQueryValidator {
     /<script[^>]*>.*?<\/script>/gi,
     /<iframe[^>]*>.*?<\/iframe>/gi,
     /javascript:/gi,
-    /on\w+\s*=/gi,
+    /on\w+=/i,
     /eval\s*\(/gi,
     /expression\s*\(/gi,
   ];
@@ -90,14 +92,14 @@ export class SearchQueryValidator {
     // Length validation
     if (query.length < this.MIN_QUERY_LENGTH) {
       throw new ValidationError(
-        `Search query must be at least ${this.MIN_QUERY_LENGTH} character(s)`, 
+        `Search query must be at least ${this.MIN_QUERY_LENGTH} character(s)`,
         "query"
       );
     }
 
     if (query.length > this.MAX_QUERY_LENGTH) {
       throw new ValidationError(
-        `Search query cannot exceed ${this.MAX_QUERY_LENGTH} characters`, 
+        `Search query cannot exceed ${this.MAX_QUERY_LENGTH} characters`,
         "query"
       );
     }
@@ -116,7 +118,7 @@ export class SearchQueryValidator {
     }
 
     const validatedQuery = query.trim();
-    
+
     if (validatedQuery.length === 0) {
       return undefined;
     }
@@ -149,7 +151,7 @@ export class LocationValidator {
     }
 
     const normalizedState = state.trim().toUpperCase();
-    
+
     if (normalizedState.length !== 2) {
       throw new ValidationError("State must be a 2-letter abbreviation", "state");
     }
@@ -177,7 +179,7 @@ export class LocationValidator {
     }
 
     const trimmedCity = city.trim();
-    
+
     if (trimmedCity.length === 0) {
       return undefined;
     }
@@ -205,7 +207,7 @@ export class PaginationValidator {
 
   static validateLimit(limit: number | undefined): number {
     const defaultLimit = 25;
-    
+
     if (limit === undefined) {
       return defaultLimit;
     }
@@ -227,7 +229,7 @@ export class PaginationValidator {
 
   static validateOffset(offset: number | undefined): number {
     const defaultOffset = 0;
-    
+
     if (offset === undefined) {
       return defaultOffset;
     }

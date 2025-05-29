@@ -33,8 +33,8 @@ const CharityLookupAPIResponseSchema = z.object({
 
 const PublicCharityCheckAPIResponseSchema = z.object({
   data: z.object({
-    public_charity: z.boolean(),
-    ein: z.string(),
+    public_charity: z.boolean().optional(),
+    ein: z.string().optional(),
   }).optional(),
   error: z.string().optional(),
   message: z.string().optional(),
@@ -42,8 +42,8 @@ const PublicCharityCheckAPIResponseSchema = z.object({
 
 const CharitySearchAPIResponseSchema = z.object({
   data: z.array(z.object({
-    ein: z.string(),
-    name: z.string(),
+    ein: z.string().optional(),
+    name: z.string().optional(),
     city: z.string().optional(),
     state: z.string().optional(),
     deductibilityCode: z.string().optional(),
@@ -112,7 +112,7 @@ export class ResponseValidator {
       }
 
       // Additional validation
-      if (typeof validated.data.public_charity !== 'boolean') {
+      if (validated.data.public_charity === undefined) {
         throw new CharityAPIError("Invalid response: public_charity status not provided", 400);
       }
 

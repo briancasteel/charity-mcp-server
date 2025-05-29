@@ -119,7 +119,7 @@ describe('Logger', () => {
       const testLogger = new Logger();
       const formatted = (testLogger as any).formatMessage('DEBUG', 'Test message', null);
       
-      expect(formatted).toBe('[2023-01-01T12:00:00.000Z] DEBUG: Test message null');
+      expect(formatted).toBe('[2023-01-01T12:00:00.000Z] DEBUG: Test message');
     });
   });
 

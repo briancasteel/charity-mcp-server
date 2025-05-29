@@ -72,7 +72,7 @@ describe('handleMCPError', () => {
       
       expect(mcpError).toBeInstanceOf(McpError);
       expect(mcpError.code).toBe(ErrorCode.InvalidParams);
-      expect(mcpError.message).toBe("Invalid parameter: EIN is required");
+      expect(mcpError.message).toBe("MCP error -32602: Invalid parameter: EIN is required");
     });
 
     it('should include field name in ValidationError conversion', () => {
@@ -81,7 +81,7 @@ describe('handleMCPError', () => {
       
       expect(mcpError).toBeInstanceOf(McpError);
       expect(mcpError.code).toBe(ErrorCode.InvalidParams);
-      expect(mcpError.message).toBe("Invalid parameter 'ein': Field is required");
+      expect(mcpError.message).toBe("MCP error -32602: Invalid parameter 'ein': Field is required");
     });
   });
 
@@ -92,7 +92,7 @@ describe('handleMCPError', () => {
       
       expect(mcpError).toBeInstanceOf(McpError);
       expect(mcpError.code).toBe(ErrorCode.InvalidParams);
-      expect(mcpError.message).toBe("Charity not found with provided EIN");
+      expect(mcpError.message).toBe("MCP error -32602: Charity not found with provided EIN");
     });
 
     it('should convert 429 CharityAPIError to InternalError McpError', () => {
@@ -101,7 +101,7 @@ describe('handleMCPError', () => {
       
       expect(mcpError).toBeInstanceOf(McpError);
       expect(mcpError.code).toBe(ErrorCode.InternalError);
-      expect(mcpError.message).toBe("Rate limit exceeded. Please try again later.");
+      expect(mcpError.message).toBe("MCP error -32603: Rate limit exceeded. Please try again later.");
     });
 
     it('should convert other CharityAPIError to InternalError McpError', () => {
@@ -110,7 +110,7 @@ describe('handleMCPError', () => {
       
       expect(mcpError).toBeInstanceOf(McpError);
       expect(mcpError.code).toBe(ErrorCode.InternalError);
-      expect(mcpError.message).toBe("Charity API error: API server error");
+      expect(mcpError.message).toBe("MCP error -32603: Charity API error: API server error");
     });
 
     it('should handle CharityAPIError without status code', () => {
@@ -119,7 +119,7 @@ describe('handleMCPError', () => {
       
       expect(mcpError).toBeInstanceOf(McpError);
       expect(mcpError.code).toBe(ErrorCode.InternalError);
-      expect(mcpError.message).toBe("Charity API error: Generic API error");
+      expect(mcpError.message).toBe("MCP error -32603: Charity API error: Generic API error");
     });
   });
 
@@ -130,7 +130,7 @@ describe('handleMCPError', () => {
       
       expect(mcpError).toBeInstanceOf(McpError);
       expect(mcpError.code).toBe(ErrorCode.InternalError);
-      expect(mcpError.message).toBe("Something went wrong");
+      expect(mcpError.message).toBe("MCP error -32603: Something went wrong");
     });
 
     it('should handle string errors', () => {
@@ -138,7 +138,7 @@ describe('handleMCPError', () => {
       
       expect(mcpError).toBeInstanceOf(McpError);
       expect(mcpError.code).toBe(ErrorCode.InternalError);
-      expect(mcpError.message).toBe("Unknown error occurred");
+      expect(mcpError.message).toBe("MCP error -32603: Unknown error occurred");
     });
 
     it('should handle null errors', () => {
@@ -146,7 +146,7 @@ describe('handleMCPError', () => {
       
       expect(mcpError).toBeInstanceOf(McpError);
       expect(mcpError.code).toBe(ErrorCode.InternalError);
-      expect(mcpError.message).toBe("Unknown error occurred");
+      expect(mcpError.message).toBe("MCP error -32603: Unknown error occurred");
     });
 
     it('should handle undefined errors', () => {
@@ -154,7 +154,7 @@ describe('handleMCPError', () => {
       
       expect(mcpError).toBeInstanceOf(McpError);
       expect(mcpError.code).toBe(ErrorCode.InternalError);
-      expect(mcpError.message).toBe("Unknown error occurred");
+      expect(mcpError.message).toBe("MCP error -32603: Unknown error occurred");
     });
 
     it('should handle object errors', () => {
@@ -162,7 +162,7 @@ describe('handleMCPError', () => {
       
       expect(mcpError).toBeInstanceOf(McpError);
       expect(mcpError.code).toBe(ErrorCode.InternalError);
-      expect(mcpError.message).toBe("Unknown error occurred");
+      expect(mcpError.message).toBe("MCP error -32603: Unknown error occurred");
     });
   });
 });
@@ -232,7 +232,8 @@ describe('setupErrorHandlers', () => {
     
     const handler = unhandledRejectionCall![1] as (reason: any, promise: Promise<any>) => void;
     const testReason = 'Test rejection reason';
-    const testPromise = Promise.reject(testReason);
+    // Create a mock promise object instead of an actual rejected promise
+    const testPromise = { then: jest.fn(), catch: jest.fn() } as any;
     
     handler(testReason, testPromise);
     

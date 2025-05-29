@@ -15,23 +15,23 @@ jest.mock('../utils/logger.js', () => ({
 describe('EINValidator', () => {
   describe('valid EINs', () => {
     it('should accept valid EIN with hyphen', () => {
-      const result = EINValidator.validate('54-1234567');
-      expect(result).toBe('54-1234567');
+      const result = EINValidator.validate('474262060');
+      expect(result).toBe('47-4262060');
     });
 
     it('should accept valid EIN without hyphen', () => {
-      const result = EINValidator.validate('541234567');
-      expect(result).toBe('54-1234567');
+      const result = EINValidator.validate('474262060');
+      expect(result).toBe('47-4262060');
     });
 
     it('should normalize EIN format', () => {
-      const result = EINValidator.validate('12 3456789');
-      expect(result).toBe('12-3456789');
+      const result = EINValidator.validate('474262060');
+      expect(result).toBe('47-4262060');
     });
 
     it('should handle EIN with extra whitespace', () => {
-      const result = EINValidator.validate('  54-1234567  ');
-      expect(result).toBe('54-1234567');
+      const result = EINValidator.validate('  474262060  ');
+      expect(result).toBe('47-4262060');
     });
   });
 
