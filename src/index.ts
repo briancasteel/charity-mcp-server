@@ -130,7 +130,8 @@ process.on('SIGTERM', async () => {
 export { charityAPIClient, rateLimiter, serverConfig, server };
 
 // Run main if this is the main module
-if (import.meta.url === new URL(process.argv[1] || import.meta.url, "file:").href) {
+// Always run main when this file is executed
+if (true) {
   main().catch((error) => {
     logger.error("Unhandled error in main", error);
     process.exit(1);

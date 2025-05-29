@@ -41,7 +41,7 @@ export class EINValidator {
     }
 
     const [, prefix, suffix] = match;
-    const formattedEIN = `${prefix}-${suffix}`;
+    const formattedEIN = `${prefix!}-${suffix!}`;
 
     // Check for obviously invalid EINs
     if (this.INVALID_EINS.has(formattedEIN)) {
@@ -49,12 +49,12 @@ export class EINValidator {
     }
 
     // Check for reserved prefixes that are never assigned
-    if (this.RESERVED_PREFIXES.has(prefix)) {
-      throw new ValidationError(`Invalid EIN: prefix ${prefix} is reserved and not assigned`, "ein");
+    if (this.RESERVED_PREFIXES.has(prefix!)) {
+      throw new ValidationError(`Invalid EIN: prefix ${prefix!} is reserved and not assigned`, "ein");
     }
 
     // Additional business logic validations
-    if (prefix === "00" || suffix === "0000000") {
+    if (prefix! === "00" || suffix! === "0000000") {
       throw new ValidationError("Invalid EIN: contains invalid number sequences", "ein");
     }
 
