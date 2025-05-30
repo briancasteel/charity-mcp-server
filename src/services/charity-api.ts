@@ -74,7 +74,7 @@ export class CharityAPIClient {
       headers: {
         'Content-Type': 'application/json',
         'User-Agent': 'charity-mcp-server/1.0.0',
-        ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        ...(this.config.apiKey && { 'apikey': this.config.apiKey }),
       },
     });
 
@@ -149,7 +149,8 @@ export class CharityAPIClient {
   async lookupCharity(ein: string): Promise<CharityLookupResponse> {
     try {
       const response = await this.retryRequest(() =>
-        this.client.get(`/api/charity_lookup/${ein}`)
+        //this.client.get(`/api/charity_lookup/${ein}`)
+        this.client.get(`/api/organizations/:${ein}`)
       );
       return response.data;
     } catch (error) {
