@@ -61,7 +61,7 @@ export class ResponseValidator {
   /**
    * Validate charity lookup API response
    */
-  static validateCharityLookupResponse(response: any): any {
+  static validateGetOrgResponse(response: any): any {
     logger.debug("Validating charity lookup response", { responseType: typeof response });
 
     try {

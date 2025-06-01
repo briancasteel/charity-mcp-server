@@ -146,7 +146,7 @@ export class CharityAPIClient {
     }
   }
 
-  async lookupCharity(ein: string): Promise<CharityLookupResponse> {
+  async getOrganizationByEIN(ein: string): Promise<CharityLookupResponse> {
     try {
       const response = await this.retryRequest(() =>
         this.client.get(`/api/organizations/:${ein}`)

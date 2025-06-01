@@ -73,10 +73,10 @@ export async function handleCharityLookup(args: unknown): Promise<CallToolResult
 
     // Make API call
     logger.info("Looking up charity", { ein: validatedEIN });
-    const apiResponse = await charityAPIClient.lookupCharity(validatedEIN);
+    const apiResponse = await charityAPIClient.getOrganizationByEIN(validatedEIN);
     
     // Validate API response
-    const validatedResponse = ResponseValidator.validateCharityLookupResponse(apiResponse);
+    const validatedResponse = ResponseValidator.validateGetOrgResponse(apiResponse);
     
     // Transform to standardized format
     const transformedCharity = CharityTransformer.transformCharityLookup(validatedResponse, validatedEIN);
