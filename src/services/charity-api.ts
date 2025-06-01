@@ -149,7 +149,6 @@ export class CharityAPIClient {
   async lookupCharity(ein: string): Promise<CharityLookupResponse> {
     try {
       const response = await this.retryRequest(() =>
-        //this.client.get(`/api/charity_lookup/${ein}`)
         this.client.get(`/api/organizations/:${ein}`)
       );
       return response.data;
@@ -180,7 +179,8 @@ export class CharityAPIClient {
   }): Promise<CharitySearchResponse> {
     try {
       const response = await this.retryRequest(() =>
-        this.client.get('/api/charity_search', { params })
+        //this.client.get('/api/charity_search', { params })
+        this.client.get('/api/organizations/search/', { params })
       );
       return response.data;
     } catch (error) {
