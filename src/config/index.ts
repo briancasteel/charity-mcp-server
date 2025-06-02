@@ -1,8 +1,13 @@
 import { CharityAPIConfig } from '../services/charity-api.js';
 import { ServerConfig } from '../types/server-capabilities.js';
 
+// Load environment variables from .env file 
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 export function loadCharityAPIConfig(): CharityAPIConfig {
   return {
+  
     baseURL: process.env.CHARITY_API_BASE_URL || 'https://api.charityapi.org',
     apiKey: process.env.CHARITY_API_KEY,
     timeout: parseInt(process.env.CHARITY_API_TIMEOUT || '10000'),
