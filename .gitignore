@@ -7,3 +7,4 @@
 **/coverage/*
 *.png
 **/.vscode
+test data.txt
