@@ -5,7 +5,7 @@ import { logger } from "../utils/logger.js";
 import { handleMCPError, CharityAPIError } from "../utils/error-handler.js";
 
 export const PUBLIC_CHARITY_CHECK_TOOL = {
-  name: "public_charity_check",
+  name: "Public Charity Check",
   description: `
     Verify if a nonprofit organization qualifies as a "public charity" according to the IRS.
     Public charities are eligible to receive tax-deductible donations under section 501(c)(3).

@@ -48,6 +48,23 @@ export const CharitySearchInputSchema = z.object({
     .default(0),
 });
 
+// List organizations tool input schema
+export const ListOrganizationsInputSchema = z.object({
+  since: z.string()
+    .refine((dateStr) => {
+      const date = new Date(dateStr);
+      return !isNaN(date.getTime());
+    }, "Since must be a valid ISO date string")
+    .transform((dateStr) => new Date(dateStr)),
+  limit: z.number()
+    .min(1, "Limit must be at least 1")
+    .max(1000, "Limit cannot exceed 1000")
+    .default(100),
+  offset: z.number()
+    .min(0, "Offset cannot be negative")
+    .default(0),
+});
+
 // Output schemas for type safety
 export const CharityLookupOutputSchema = z.object({
   ein: z.string(),
@@ -87,11 +104,42 @@ export const CharitySearchOutputSchema = z.object({
   }),
 });
 
+export const ListOrganizationsOutputSchema = z.object({
+  organizations: z.array(z.object({
+    ein: z.string(),
+    name: z.string(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    zip: z.string().optional(),
+    street: z.string().optional(),
+    status: z.string().optional(),
+    classification: z.string().optional(),
+    subsection: z.string().optional(),
+    foundation: z.string().optional(),
+    activity: z.string().optional(),
+    organization: z.string().optional(),
+    deductibility: z.string().optional(),
+    ruling: z.string().optional(),
+    taxPeriod: z.string().optional(),
+    revenueAmount: z.string().optional(),
+    incomeAmount: z.string().optional(),
+    assetAmount: z.string().optional(),
+  })),
+  pagination: z.object({
+    total: z.number(),
+    page: z.number(),
+    limit: z.number(),
+    hasMore: z.boolean(),
+  }),
+  since: z.date(),
+});
+
 // Type exports for TypeScript
 export type CharityLookupInput = z.infer<typeof CharityLookupInputSchema>;
 export type PublicCharityCheckInput = z.infer<typeof PublicCharityCheckInputSchema>;
 export type CharitySearchInput = z.infer<typeof CharitySearchInputSchema>;
+export type ListOrganizationsInput = z.infer<typeof ListOrganizationsInputSchema>;
 export type CharityLookupOutput = z.infer<typeof CharityLookupOutputSchema>;
 export type PublicCharityCheckOutput = z.infer<typeof PublicCharityCheckOutputSchema>;
 export type CharitySearchOutput = z.infer<typeof CharitySearchOutputSchema>;
-
+export type ListOrganizationsOutput = z.infer<typeof ListOrganizationsOutputSchema>;

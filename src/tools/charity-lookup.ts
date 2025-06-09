@@ -11,7 +11,7 @@ import { ResponseFormatter } from "../formatting/response-formatter.js";
 import { ErrorFormatter } from "../formatting/error-formatter.js";
 
 export const CHARITY_LOOKUP_TOOL = {
-  name: "charity_lookup",
+  name: "Charity Lookup",
   description: `
     Look up detailed information about a charity or nonprofit organization using their EIN (Employer Identification Number).
     This tool retrieves comprehensive information from the IRS database including:

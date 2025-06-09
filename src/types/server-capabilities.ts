@@ -3,6 +3,7 @@ export interface ServerCapabilities {
     charityLookup: boolean;
     publicCharityCheck: boolean;
     charitySearch: boolean;
+    listOrganizations: boolean;
   };
   resources: {
     cachedCharities: boolean;
@@ -23,4 +24,3 @@ export interface ServerConfig {
   enableCaching: boolean;
   logLevel: 'debug' | 'info' | 'warn' | 'error';
 }
-

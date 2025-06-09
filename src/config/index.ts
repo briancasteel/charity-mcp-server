@@ -25,6 +25,7 @@ export function loadServerConfig(): ServerConfig {
         charityLookup: true,
         publicCharityCheck: true,
         charitySearch: true,
+        listOrganizations: true,
       },
       resources: {
         cachedCharities: false, // Can be enabled later
