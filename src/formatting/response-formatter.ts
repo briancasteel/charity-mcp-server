@@ -119,11 +119,10 @@ export class ResponseFormatter {
    */
   static formatCharitySearch(output: CharitySearchOutput, searchCriteria: any): string {
     logger.debug("Formatting charity search response", { 
-      resultCount: output.results.length,
-      totalResults: output.pagination.total 
+      resultCount: output.results.length
     });
 
-    const { results, pagination } = output;
+    const { results } = output;
     
     let response = `# 🔎 Charity Search Results\n\n`;
     
@@ -134,9 +133,7 @@ export class ResponseFormatter {
     if (searchCriteria.state) criteria.push(`State: ${searchCriteria.state}`);
     
     response += `**Search Criteria:** ${criteria.join(', ')}\n`;
-    response += `**Results Shown:** ${results.length} organizations\n`;
-    response += `**Total Available:** ${pagination.total.toLocaleString()} organizations\n`;
-    response += `**Page:** ${pagination.page}\n\n`;
+    response += `**Results Found:** ${results.length} organizations\n\n`;
 
     if (results.length === 0) {
       response += `## 📭 No Results Found\n\n`;
@@ -153,11 +150,7 @@ export class ResponseFormatter {
     response += `## 📊 Search Results\n\n`;
     
     results.forEach((charity, index) => {
-      const resultNumber = pagination.page > 1 
-        ? (pagination.page - 1) * pagination.limit + index + 1 
-        : index + 1;
-      
-      response += `### ${resultNumber}. ${charity.name}\n`;
+      response += `### ${index + 1}. ${charity.name}\n`;
       response += `**EIN:** \`${charity.ein}\`\n`;
       
       if (charity.city || charity.state) {
@@ -171,15 +164,6 @@ export class ResponseFormatter {
       
       response += `\n`;
     });
-
-    // Pagination info
-    if (pagination.hasMore) {
-      const nextOffset = pagination.page * pagination.limit;
-      response += `---\n\n`;
-      response += `### 📄 More Results Available\n`;
-      response += `There are additional results available. `;
-      response += `Use \`offset=${nextOffset}\` to see the next ${pagination.limit} results.\n`;
-    }
 
     logger.debug("Charity search formatting completed");
     return response;

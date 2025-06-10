@@ -25,7 +25,7 @@ export interface OrganizationResponse {
       organization: string;     // This defines the type of organization as follows:\n        Code Description\n        1 Corporation\n        2 Trust\n        3 Co-operative\n        4 Partnership\n        5 Association
       ntee_cd: string;          // National Taxonomy of Exempt Entities Code.
       name: string;             // The name of the organization
-       income_cd: string;        // Income Codes relate to the amount of income shown on the most recent Form 990 series return filed by the organization.\n        ASSET CODE/INCOME CODE TABLE\n        Code Description($)\n        0 0\n        1 1 to 9,999\n        2 10,000 to 24,999\n        3 25,000 to 99,999\n        4 100,000 to 499,999\n        5 500,000 to 999,999\n        6 1,000,000 to 4,999,999\n        7 5,000,000 to 9,999,999\n        8 10,000,000 to 49,999,999\n        9 50,000,000 to greater
+      income_cd: string;        // Income Codes relate to the amount of income shown on the most recent Form 990 series return filed by the organization.\n        ASSET CODE/INCOME CODE TABLE\n        Code Description($)\n        0 0\n        1 1 to 9,999\n        2 10,000 to 24,999\n        3 25,000 to 99,999\n        4 100,000 to 499,999\n        5 500,000 to 999,999\n        6 1,000,000 to 4,999,999\n        7 5,000,000 to 9,999,999\n        8 10,000,000 to 49,999,999\n        9 50,000,000 to greater
       income_amt: string;       // Income Amount is a computer generated amount from the most recent Form 990 series return filed by the organization.\n        Income Amount is computer generated using PART I, Total Revenue Line 12 and adding 'back in' the expense items, i.e.\n        Line 6b (Rental Expenses) shown on the Form 990 return. On Form 990EZ it is generated using PART I, Line 9 and\n        adding 'back in' the expense items, i.e. Line 5b (Cost or Other Basis Expenses). Income Amount for Form 990PF is\n        generated using Part I, Line 10b (Cost of Goods) and adding Part I, Line 12, Col. (A) (Total Revenue Col. A) and Part IV,\n        Line 1, Col. (G) (Cost or Other Basis). This field is dollars only.
       ico: string;              // In Care Of - the person to whom correspondence should be addressed.
       group: string;            // This is a four-digit IRS-internal number assigned to central/parent organizations holding group exemption letters.
@@ -58,11 +58,39 @@ export interface CharitySearchResponse {
     state: string;
     deductibilityCode: string;
   }>;
-  pagination?: {
-    page: number;
-    totalPages: number;
-    totalResults: number;
-  };
+}
+
+export interface ListOrganizationsResponse {
+  data: Array<{
+    zip: string;
+    tax_period: string;
+    subsection: string;
+    street: string;
+    status: string;
+    state: string;
+    sort_name: string;
+    ruling: string;
+    revenue_amt: string;
+    pf_filing_req_cd: string;
+    organization: string;
+    ntee_cd: string;
+    name: string;
+    income_cd: string;
+    income_amt: string;
+    ico: string;
+    group: string;
+    foundation: string;
+    filing_req_cd: string;
+    ein: string;
+    deductibility: string;
+    classification: string;
+    city: string;
+    asset_cd: string;
+    asset_amt: string;
+    affiliation: string;
+    activity: string;
+    acct_pd: string;
+  }>;
 }
 
 export class CharityAPIClient {
@@ -153,7 +181,7 @@ export class CharityAPIClient {
     }
   }
 
-  async listOrganizations(since: Date): Promise<OrganizationResponse> {
+  async listOrganizations(since: Date): Promise<ListOrganizationsResponse> {
     try {
       const response = await this.retryRequest(() =>
         this.client.get('/api/organizations?since=', {
@@ -195,13 +223,14 @@ export class CharityAPIClient {
     q?: string;
     city?: string;
     state?: string;
-    limit?: number;
-    offset?: number;
   }): Promise<CharitySearchResponse> {
     try {
+      const url = new URL(`/api/organizations/search/${params.q}`, this.config.baseURL);
+      if (params.city) {url.searchParams.append('city', params.city);}
+      if (params.state) {url.searchParams.append('state', params.state);}
       const response = await this.retryRequest(() =>
         //this.client.get('/api/charity_search', { params })
-        this.client.get('/api/organizations/search/', { params })
+        this.client.get(url.toString())
       );
       return response.data;
     } catch (error) {

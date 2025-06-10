@@ -14,8 +14,6 @@ export const CHARITY_SEARCH_TOOL = {
     - query: Organization name or keywords
     - city: Filter by city name
     - state: Filter by state (2-letter code like 'CA', 'NY')
-    - limit: Number of results to return (1-100, default 25)
-    - offset: Skip first N results for pagination (default 0)
     
     Returns a list of matching organizations with basic information including:
     - Organization name and EIN
@@ -41,19 +39,6 @@ export const CHARITY_SEARCH_TOOL = {
         type: "string",
         description: "Filter by state using 2-letter abbreviation like 'CA' or 'NY' (optional)",
         pattern: "^[A-Z]{2}$",
-      },
-      limit: {
-        type: "number",
-        description: "Number of results to return (1-100, default 25)",
-        minimum: 1,
-        maximum: 100,
-        default: 25,
-      },
-      offset: {
-        type: "number",
-        description: "Number of results to skip for pagination (default 0)",
-        minimum: 0,
-        default: 0,
       },
     },
     required: [],
@@ -102,8 +87,6 @@ export async function handleCharitySearch(args: unknown): Promise<CallToolResult
       q: input.query,
       city: input.city,
       state: input.state,
-      limit: input.limit,
-      offset: input.offset,
     };
 
     // Make API call
@@ -116,11 +99,6 @@ export async function handleCharitySearch(args: unknown): Promise<CallToolResult
 
     // Format response
     const results = Array.isArray(response.data) ? response.data : [];
-    const pagination = response.pagination || {
-      totalResults: results.length,
-      page: Math.floor(input.offset / input.limit) + 1,
-      totalPages: Math.ceil(results.length / input.limit),
-    };
 
     const output: CharitySearchOutput = {
       results: results.map(charity => ({
@@ -130,12 +108,6 @@ export async function handleCharitySearch(args: unknown): Promise<CallToolResult
         state: charity.state,
         deductibilityCode: charity.deductibilityCode,
       })),
-      pagination: {
-        total: pagination.totalResults || results.length,
-        page: pagination.page || Math.floor(input.offset / input.limit) + 1,
-        limit: input.limit,
-        hasMore: (input.offset + input.limit) < (pagination.totalResults || results.length),
-      },
     };
 
     // Create formatted text response
@@ -172,7 +144,7 @@ export async function handleCharitySearch(args: unknown): Promise<CallToolResult
 }
 
 function formatCharitySearchResponse(output: CharitySearchOutput, input: CharitySearchInput): string {
-  const { results, pagination } = output;
+  const { results } = output;
   
   let response = `# Charity Search Results\n\n`;
   
@@ -183,8 +155,7 @@ function formatCharitySearchResponse(output: CharitySearchOutput, input: Charity
   if (input.state) searchCriteria.push(`State: ${input.state}`);
   
   response += `**Search Criteria:** ${searchCriteria.join(', ')}\n`;
-  response += `**Results:** ${results.length} organizations (Page ${pagination.page})\n`;
-  response += `**Total Available:** ${pagination.total} organizations\n\n`;
+  response += `**Results:** ${results.length} organizations found\n\n`;
 
   if (results.length === 0) {
     response += `No organizations found matching your search criteria. Try:\n`;
@@ -196,11 +167,7 @@ function formatCharitySearchResponse(output: CharitySearchOutput, input: Charity
 
   // Results listing
   results.forEach((charity, index) => {
-    const resultNumber = pagination.page > 1 
-      ? (pagination.page - 1) * pagination.limit + index + 1 
-      : index + 1;
-    
-    response += `## ${resultNumber}. ${charity.name}\n`;
+    response += `## ${index + 1}. ${charity.name}\n`;
     response += `**EIN:** ${charity.ein}\n`;
     
     if (charity.city || charity.state) {
@@ -213,13 +180,6 @@ function formatCharitySearchResponse(output: CharitySearchOutput, input: Charity
     
     response += `\n`;
   });
-
-  // Pagination info
-  if (pagination.hasMore) {
-    const nextOffset = (pagination.page * pagination.limit);
-    response += `---\n`;
-    response += `**More Results Available:** Use offset=${nextOffset} to see the next ${pagination.limit} results.\n`;
-  }
 
   return response;
 }

@@ -28,24 +28,19 @@ export const PublicCharityCheckInputSchema = z.object({
 // Charity search tool input schema
 export const CharitySearchInputSchema = z.object({
   query: z.string()
-    .min(1, "Search query cannot be empty")
+    .min(0, "Search query cannot be empty")
     .max(200, "Search query cannot exceed 200 characters")
     .optional(),
   city: z.string()
-    .min(1, "City name cannot be empty")
-    .max(100, "City name cannot exceed 100 characters")
-    .optional(),
+    .optional()
+    .transform((val) => val === "" ? undefined : val)
+    .refine((val) => val === undefined || (val.length <= 100), 
+      "City name cannot exceed 100 characters"),
   state: z.string()
-    .length(2, "State must be a 2-letter abbreviation (e.g., CA, NY)")
-    .regex(/^[A-Z]{2}$/, "State must be uppercase 2-letter abbreviation")
-    .optional(),
-  limit: z.number()
-    .min(1, "Limit must be at least 1")
-    .max(100, "Limit cannot exceed 100")
-    .default(25),
-  offset: z.number()
-    .min(0, "Offset cannot be negative")
-    .default(0),
+    .optional()
+    .transform((val) => val === "" ? undefined : val)
+    .refine((val) => val === undefined || (val.length === 2 && /^[A-Z]{2}$/.test(val)), 
+      "State must be a 2-letter uppercase abbreviation (e.g., CA, NY)"),
 });
 
 // List organizations tool input schema
@@ -56,13 +51,6 @@ export const ListOrganizationsInputSchema = z.object({
       return !isNaN(date.getTime());
     }, "Since must be a valid ISO date string")
     .transform((dateStr) => new Date(dateStr)),
-  limit: z.number()
-    .min(1, "Limit must be at least 1")
-    .max(1000, "Limit cannot exceed 1000")
-    .default(100),
-  offset: z.number()
-    .min(0, "Offset cannot be negative")
-    .default(0),
 });
 
 // Output schemas for type safety
@@ -96,12 +84,6 @@ export const CharitySearchOutputSchema = z.object({
     state: z.string().optional(),
     deductibilityCode: z.string().optional(),
   })),
-  pagination: z.object({
-    total: z.number(),
-    page: z.number(),
-    limit: z.number(),
-    hasMore: z.boolean(),
-  }),
 });
 
 export const ListOrganizationsOutputSchema = z.object({
@@ -125,12 +107,6 @@ export const ListOrganizationsOutputSchema = z.object({
     incomeAmount: z.string().optional(),
     assetAmount: z.string().optional(),
   })),
-  pagination: z.object({
-    total: z.number(),
-    page: z.number(),
-    limit: z.number(),
-    hasMore: z.boolean(),
-  }),
   since: z.date(),
 });
 

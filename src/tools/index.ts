@@ -23,16 +23,16 @@ export function registerAllTools(server: Server) {
       const { name, arguments: args } = request.params;
 
       switch (name) {
-        case "charity_lookup":
+        case CHARITY_LOOKUP_TOOL.name:
           return await handleCharityLookup(args);
         
-        case "public_charity_check":
+        case PUBLIC_CHARITY_CHECK_TOOL.name:
           return await handlePublicCharityCheck(args);
         
-        case "charity_search":
+        case CHARITY_SEARCH_TOOL.name:
           return await handleCharitySearch(args);
         
-        case "list_organizations":
+        case LIST_ORGANIZATIONS_TOOL.name:
           return await handleListOrganizations(args);
         
         default:

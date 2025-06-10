@@ -93,8 +93,6 @@ describe('CharitySearchInputSchema', () => {
     it('should validate with query only', () => {
       const result = CharitySearchInputSchema.parse({ query: 'test charity' });
       expect(result.query).toBe('test charity');
-      expect(result.limit).toBe(25); // default
-      expect(result.offset).toBe(0); // default
     });
 
     it('should validate with city and state', () => {
@@ -106,26 +104,37 @@ describe('CharitySearchInputSchema', () => {
       expect(result.state).toBe('CA');
     });
 
-    it('should validate with custom limit and offset', () => {
+    it('should validate with all fields', () => {
       const result = CharitySearchInputSchema.parse({ 
         query: 'test',
-        limit: 50,
-        offset: 10 
+        city: 'San Francisco',
+        state: 'CA'
       });
-      expect(result.limit).toBe(50);
-      expect(result.offset).toBe(10);
+      expect(result.query).toBe('test');
+      expect(result.city).toBe('San Francisco');
+      expect(result.state).toBe('CA');
     });
 
-    it('should apply default values', () => {
+    it('should validate empty input', () => {
       const result = CharitySearchInputSchema.parse({});
-      expect(result.limit).toBe(25);
-      expect(result.offset).toBe(0);
+      expect(result).toEqual({});
+    });
+
+    it('should handle empty state string correctly', () => {
+      const result = CharitySearchInputSchema.parse({ state: '' });
+      expect(result.state).toBeUndefined();
+    });
+
+    it('should handle empty city string correctly', () => {
+      const result = CharitySearchInputSchema.parse({ city: '' });
+      expect(result.city).toBeUndefined();
     });
   });
 
   describe('invalid inputs', () => {
-    it('should reject empty query', () => {
-      expect(() => CharitySearchInputSchema.parse({ query: '' })).toThrow('Search query cannot be empty');
+    it('should accept empty query', () => {
+      const result = CharitySearchInputSchema.parse({ query: '' });
+      expect(result.query).toBe('');
     });
 
     it('should reject query too long', () => {
@@ -133,8 +142,9 @@ describe('CharitySearchInputSchema', () => {
       expect(() => CharitySearchInputSchema.parse({ query: longQuery })).toThrow('Search query cannot exceed 200 characters');
     });
 
-    it('should reject empty city', () => {
-      expect(() => CharitySearchInputSchema.parse({ city: '' })).toThrow('City name cannot be empty');
+    it('should accept empty city', () => {
+      const result = CharitySearchInputSchema.parse({ city: '' });
+      expect(result.city).toBeUndefined();
     });
 
     it('should reject city too long', () => {
@@ -143,23 +153,11 @@ describe('CharitySearchInputSchema', () => {
     });
 
     it('should reject invalid state format', () => {
-      expect(() => CharitySearchInputSchema.parse({ state: 'California' })).toThrow('State must be a 2-letter abbreviation');
+      expect(() => CharitySearchInputSchema.parse({ state: 'California' })).toThrow('State must be a 2-letter uppercase abbreviation');
     });
 
     it('should reject lowercase state', () => {
-      expect(() => CharitySearchInputSchema.parse({ state: 'ca' })).toThrow('State must be uppercase 2-letter abbreviation');
-    });
-
-    it('should reject limit too small', () => {
-      expect(() => CharitySearchInputSchema.parse({ limit: 0 })).toThrow('Limit must be at least 1');
-    });
-
-    it('should reject limit too large', () => {
-      expect(() => CharitySearchInputSchema.parse({ limit: 101 })).toThrow('Limit cannot exceed 100');
-    });
-
-    it('should reject negative offset', () => {
-      expect(() => CharitySearchInputSchema.parse({ offset: -1 })).toThrow('Offset cannot be negative');
+      expect(() => CharitySearchInputSchema.parse({ state: 'ca' })).toThrow('State must be a 2-letter uppercase abbreviation');
     });
   });
 });
@@ -247,13 +245,7 @@ describe('CharitySearchOutputSchema', () => {
           ein: '98-7654321',
           name: 'Test Charity 2'
         }
-      ],
-      pagination: {
-        total: 150,
-        page: 1,
-        limit: 25,
-        hasMore: true
-      }
+      ]
     };
 
     const result = CharitySearchOutputSchema.parse(validOutput);
@@ -262,34 +254,20 @@ describe('CharitySearchOutputSchema', () => {
 
   it('should validate empty results', () => {
     const emptyOutput = {
-      results: [],
-      pagination: {
-        total: 0,
-        page: 1,
-        limit: 25,
-        hasMore: false
-      }
+      results: []
     };
 
     const result = CharitySearchOutputSchema.parse(emptyOutput);
     expect(result.results).toHaveLength(0);
-    expect(result.pagination.total).toBe(0);
   });
 
   it('should reject missing required fields', () => {
-    expect(() => CharitySearchOutputSchema.parse({ results: [] })).toThrow();
-    expect(() => CharitySearchOutputSchema.parse({ pagination: {} })).toThrow();
+    expect(() => CharitySearchOutputSchema.parse({})).toThrow();
   });
 
   it('should reject invalid result structure', () => {
     const invalidOutput = {
-      results: [{ name: 'Missing EIN' }],
-      pagination: {
-        total: 1,
-        page: 1,
-        limit: 25,
-        hasMore: false
-      }
+      results: [{ name: 'Missing EIN' }]
     };
 
     expect(() => CharitySearchOutputSchema.parse(invalidOutput)).toThrow();

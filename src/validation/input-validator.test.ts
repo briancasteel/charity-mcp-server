@@ -1,5 +1,5 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
-import { EINValidator, SearchQueryValidator, LocationValidator, PaginationValidator } from './input-validator.js';
+import { EINValidator, SearchQueryValidator, LocationValidator } from './input-validator.js';
 import { ValidationError } from '../utils/error-handler.js';
 
 // Mock the logger
@@ -232,62 +232,6 @@ describe('LocationValidator', () => {
         expect(() => LocationValidator.validateCity('123456789')).toThrow('too many non-alphabetic characters');
         expect(() => LocationValidator.validateCity('@@@@@@@@')).toThrow('too many non-alphabetic characters');
       });
-    });
-  });
-});
-
-describe('PaginationValidator', () => {
-  describe('limit validation', () => {
-    it('should return default limit for undefined', () => {
-      expect(PaginationValidator.validateLimit(undefined)).toBe(25);
-    });
-
-    it('should accept valid limits', () => {
-      expect(PaginationValidator.validateLimit(1)).toBe(1);
-      expect(PaginationValidator.validateLimit(50)).toBe(50);
-      expect(PaginationValidator.validateLimit(100)).toBe(100);
-    });
-
-    it('should reject non-integer limits', () => {
-      expect(() => PaginationValidator.validateLimit(1.5)).toThrow('must be an integer');
-      expect(() => PaginationValidator.validateLimit('10' as any)).toThrow('must be an integer');
-    });
-
-    it('should reject limits below minimum', () => {
-      expect(() => PaginationValidator.validateLimit(0)).toThrow('must be at least 1');
-      expect(() => PaginationValidator.validateLimit(-1)).toThrow('must be at least 1');
-    });
-
-    it('should reject limits above maximum', () => {
-      expect(() => PaginationValidator.validateLimit(101)).toThrow('cannot exceed 100');
-      expect(() => PaginationValidator.validateLimit(1000)).toThrow('cannot exceed 100');
-    });
-  });
-
-  describe('offset validation', () => {
-    it('should return default offset for undefined', () => {
-      expect(PaginationValidator.validateOffset(undefined)).toBe(0);
-    });
-
-    it('should accept valid offsets', () => {
-      expect(PaginationValidator.validateOffset(0)).toBe(0);
-      expect(PaginationValidator.validateOffset(100)).toBe(100);
-      expect(PaginationValidator.validateOffset(5000)).toBe(5000);
-    });
-
-    it('should reject non-integer offsets', () => {
-      expect(() => PaginationValidator.validateOffset(1.5)).toThrow('must be an integer');
-      expect(() => PaginationValidator.validateOffset('10' as any)).toThrow('must be an integer');
-    });
-
-    it('should reject negative offsets', () => {
-      expect(() => PaginationValidator.validateOffset(-1)).toThrow('cannot be negative');
-      expect(() => PaginationValidator.validateOffset(-100)).toThrow('cannot be negative');
-    });
-
-    it('should reject offsets above maximum', () => {
-      expect(() => PaginationValidator.validateOffset(10001)).toThrow('cannot exceed 10000');
-      expect(() => PaginationValidator.validateOffset(50000)).toThrow('cannot exceed 10000');
     });
   });
 });

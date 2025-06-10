@@ -75,7 +75,6 @@ export class CharityTransformer {
     logger.debug("Transforming charity search response", { searchParams });
 
     const results = apiResponse.data || [];
-    const pagination = apiResponse.pagination || {};
     
     const transformedResults = results.map((charity: any) => ({
       ein: this.normalizeEIN(charity.ein),
@@ -87,17 +86,10 @@ export class CharityTransformer {
 
     const transformed: CharitySearchOutput = {
       results: transformedResults,
-      pagination: {
-        total: this.normalizeNumber(pagination.totalResults, transformedResults.length),
-        page: this.normalizeNumber(pagination.page, 1),
-        limit: this.normalizeNumber(searchParams.limit, 25),
-        hasMore: this.calculateHasMore(pagination, searchParams, transformedResults.length),
-      },
     };
 
     logger.debug("Charity search transformation complete", { 
-      resultCount: transformedResults.length,
-      totalResults: transformed.pagination.total 
+      resultCount: transformedResults.length
     });
 
     return transformed;
@@ -208,17 +200,6 @@ export class CharityTransformer {
     return defaultValue;
   }
 
-  /**
-   * Calculate if there are more results available
-   */
-  private static calculateHasMore(pagination: any, searchParams: any, currentResultCount: number): boolean {
-    if (pagination.totalResults && searchParams.limit && searchParams.offset !== undefined) {
-      return (searchParams.offset + searchParams.limit) < pagination.totalResults;
-    }
-    
-    // Fallback: assume there are more if we got a full page
-    return currentResultCount >= (searchParams.limit || 25);
-  }
 
   /**
    * Convert string to title case

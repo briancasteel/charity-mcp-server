@@ -12,8 +12,6 @@ export const LIST_ORGANIZATIONS_TOOL = {
     
     Parameters:
     - since: ISO date string (required) - Get organizations updated since this date (e.g., "2024-01-01T00:00:00Z")
-    - limit: Number of results to return (1-1000, default 100)
-    - offset: Skip first N results for pagination (default 0)
     
     Returns detailed information about organizations including:
     - Basic information (EIN, name, address)
@@ -30,19 +28,6 @@ export const LIST_ORGANIZATIONS_TOOL = {
         type: "string",
         description: "ISO date string to get organizations updated since this date (e.g., '2024-01-01T00:00:00Z')",
         format: "date-time",
-      },
-      limit: {
-        type: "number",
-        description: "Number of results to return (1-1000, default 100)",
-        minimum: 1,
-        maximum: 1000,
-        default: 100,
-      },
-      offset: {
-        type: "number",
-        description: "Number of results to skip for pagination (default 0)",
-        minimum: 0,
-        default: 0,
       },
     },
     required: ["since"],
@@ -74,7 +59,7 @@ export async function handleListOrganizations(args: unknown): Promise<CallToolRe
     }
 
     // Make API call
-    logger.info("Listing organizations", { since: input.since.toISOString(), limit: input.limit, offset: input.offset });
+    logger.info("Listing organizations", { since: input.since.toISOString() });
     const response = await charityAPIClient.listOrganizations(input.since);
     
     if (!response.data) {
@@ -83,15 +68,10 @@ export async function handleListOrganizations(args: unknown): Promise<CallToolRe
 
     // Handle the response data - it should be an array or single organization
     const organizations = Array.isArray(response.data) ? response.data : [response.data];
-    
-    // Apply pagination manually since API might not support it
-    const startIndex = input.offset;
-    const endIndex = startIndex + input.limit;
-    const paginatedOrgs = organizations.slice(startIndex, endIndex);
 
     // Format response
     const output: ListOrganizationsOutput = {
-      organizations: paginatedOrgs.map(org => ({
+      organizations: organizations.map(org => ({
         ein: org.ein,
         name: org.name,
         city: org.city,
@@ -111,12 +91,6 @@ export async function handleListOrganizations(args: unknown): Promise<CallToolRe
         incomeAmount: org.income_amt,
         assetAmount: org.asset_amt,
       })),
-      pagination: {
-        total: organizations.length,
-        page: Math.floor(input.offset / input.limit) + 1,
-        limit: input.limit,
-        hasMore: (input.offset + input.limit) < organizations.length,
-      },
       since: input.since,
     };
 
@@ -125,7 +99,6 @@ export async function handleListOrganizations(args: unknown): Promise<CallToolRe
 
     logger.info("List organizations completed successfully", { 
       resultCount: output.organizations.length,
-      totalAvailable: organizations.length,
       since: input.since.toISOString()
     });
 
@@ -155,14 +128,13 @@ export async function handleListOrganizations(args: unknown): Promise<CallToolRe
 }
 
 function formatListOrganizationsResponse(output: ListOrganizationsOutput, input: ListOrganizationsInput): string {
-  const { organizations, pagination, since } = output;
+  const { organizations, since } = output;
   
   let response = `# Organizations List\n\n`;
   
   // Query summary
   response += `**Updated Since:** ${since.toISOString()}\n`;
-  response += `**Results:** ${organizations.length} organizations (Page ${pagination.page})\n`;
-  response += `**Total Available:** ${pagination.total} organizations\n\n`;
+  response += `**Results:** ${organizations.length} organizations found\n\n`;
 
   if (organizations.length === 0) {
     response += `No organizations found that have been updated since ${since.toISOString()}.\n`;
@@ -172,11 +144,7 @@ function formatListOrganizationsResponse(output: ListOrganizationsOutput, input:
 
   // Organizations listing
   organizations.forEach((org, index) => {
-    const resultNumber = pagination.page > 1 
-      ? (pagination.page - 1) * pagination.limit + index + 1 
-      : index + 1;
-    
-    response += `## ${resultNumber}. ${org.name}\n`;
+    response += `## ${index + 1}. ${org.name}\n`;
     response += `**EIN:** ${org.ein}\n`;
     
     // Address information
@@ -226,13 +194,6 @@ function formatListOrganizationsResponse(output: ListOrganizationsOutput, input:
     
     response += `\n`;
   });
-
-  // Pagination info
-  if (pagination.hasMore) {
-    const nextOffset = pagination.page * pagination.limit;
-    response += `---\n`;
-    response += `**More Results Available:** Use offset=${nextOffset} to see the next ${pagination.limit} results.\n`;
-  }
 
   return response;
 }

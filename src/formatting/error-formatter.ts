@@ -36,13 +36,6 @@ export class ErrorFormatter {
       suggestions.push('Check spelling of city name');
       suggestions.push('Use standard city names');
       details = 'City names should contain mostly alphabetic characters';
-    } else if (error.field === 'limit') {
-      suggestions.push('Use a number between 1 and 100');
-      details = 'Limit controls how many results are returned per request';
-    } else if (error.field === 'offset') {
-      suggestions.push('Use a non-negative number');
-      suggestions.push('Start with 0 for the first page');
-      details = 'Offset controls which page of results to return';
     }
 
     return {
