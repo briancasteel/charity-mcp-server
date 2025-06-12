@@ -229,7 +229,6 @@ export class CharityAPIClient {
       if (params.city) {url.searchParams.append('city', params.city);}
       if (params.state) {url.searchParams.append('state', params.state);}
       const response = await this.retryRequest(() =>
-        //this.client.get('/api/charity_search', { params })
         this.client.get(url.toString())
       );
       return response.data;

@@ -27,7 +27,7 @@ export const CHARITY_SEARCH_TOOL = {
     properties: {
       query: {
         type: "string",
-        description: "Search term for organization name or keywords (optional)",
+        description: "Search term for organization name or keywords",
         maxLength: 200,
       },
       city: {
@@ -59,7 +59,7 @@ export async function handleCharitySearch(args: unknown): Promise<CallToolResult
         content: [
           {
             type: "text",
-            text: "At least one search parameter (query, city, or state) must be provided.",
+            text: "At least one search parameter must be provided.",
           } as TextContent,
         ],
         isError: true,

@@ -132,9 +132,8 @@ describe('CharitySearchInputSchema', () => {
   });
 
   describe('invalid inputs', () => {
-    it('should accept empty query', () => {
-      const result = CharitySearchInputSchema.parse({ query: '' });
-      expect(result.query).toBe('');
+    it('should reject empty query', () => {
+      expect(() => CharitySearchInputSchema.parse({ query: '' })).toThrow('Search query cannot be empty');
     });
 
     it('should reject query too long', () => {
@@ -153,11 +152,12 @@ describe('CharitySearchInputSchema', () => {
     });
 
     it('should reject invalid state format', () => {
-      expect(() => CharitySearchInputSchema.parse({ state: 'California' })).toThrow('State must be a 2-letter uppercase abbreviation');
+      expect(() => CharitySearchInputSchema.parse({ state: 'California' })).toThrow('State must be a 2-letter abbreviation');
     });
 
-    it('should reject lowercase state', () => {
-      expect(() => CharitySearchInputSchema.parse({ state: 'ca' })).toThrow('State must be a 2-letter uppercase abbreviation');
+    it('should accept lowercase state and transform to uppercase', () => {
+      const result = CharitySearchInputSchema.parse({ state: 'ca' });
+      expect(result.state).toBe('CA');
     });
   });
 });

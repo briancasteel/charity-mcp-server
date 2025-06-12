@@ -28,7 +28,7 @@ export const PublicCharityCheckInputSchema = z.object({
 // Charity search tool input schema
 export const CharitySearchInputSchema = z.object({
   query: z.string()
-    .min(0, "Search query cannot be empty")
+    .min(3, "Search query cannot be empty")
     .max(200, "Search query cannot exceed 200 characters")
     .optional(),
   city: z.string()
@@ -39,8 +39,9 @@ export const CharitySearchInputSchema = z.object({
   state: z.string()
     .optional()
     .transform((val) => val === "" ? undefined : val)
-    .refine((val) => val === undefined || (val.length === 2 && /^[A-Z]{2}$/.test(val)), 
-      "State must be a 2-letter uppercase abbreviation (e.g., CA, NY)"),
+    .transform((val) => val?.toUpperCase())
+    .refine((val) => val === undefined || (val.length === 2 && /^[A-Za-z]{2}$/.test(val)), 
+      "State must be a 2-letter abbreviation (e.g., CA, ca, NY, ny)"),
 });
 
 // List organizations tool input schema

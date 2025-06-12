@@ -8,3 +8,4 @@
 *.png
 **/.vscode
 test data.txt
+curltest.cmd
