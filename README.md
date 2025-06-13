@@ -19,6 +19,12 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that pr
 - Check 501(c)(3) status for donation planning
 - Instant verification of tax-deductible status
 
+### 📝 **AI Assistant Prompts**
+- Built-in prompts for charity verification workflows
+- Quick reference templates for common verification scenarios
+- Best practices guidance for AI assistants
+- Dynamic prompt generation with customizable parameters
+
 ### 🛡️ **Enterprise Features**
 - **Rate Limiting**: Configurable API rate limits to prevent abuse
 - **Input Validation**: Comprehensive validation with security checks
@@ -159,6 +165,67 @@ Verify if an organization qualifies as a tax-deductible public charity.
 - Tax-deductible donation eligibility
 - EIN confirmation
 
+## Available Prompts
+
+The server provides built-in prompts to help AI assistants perform charity verification effectively:
+
+### Verification Prompts
+
+1. **Charity Verification Guide** (`charity_verification_guide`)
+   - Complete guide for performing charity legitimacy verification
+   - Customizable by organization type (name_only, ein_based, suspicious, etc.)
+
+2. **Basic Legitimacy Workflow** (`basic_legitimacy_workflow`)
+   - Step-by-step workflows for different verification scenarios
+   - Parameters: verification_type, organization_name, ein, location
+
+3. **Red Flag Detection** (`red_flag_detection`)
+   - Guidance for detecting and handling problematic charity statuses
+   - Handles revoked, conditional, and suspended organizations
+
+4. **Verification Response Templates** (`verification_response_templates`)
+   - Standardized response formats for different verification outcomes
+   - Templates for verified, failed, conditional, and not_found cases
+
+### Quick Reference Prompts
+
+1. **Quick Verification Reference** (`quick_verification_reference`)
+   - Fast lookup templates for common verification scenarios
+   - Customizable by user input type
+
+2. **Response Templates Quick** (`response_templates_quick`)
+   - Quick response templates with status indicators (✅ ⚠️ ❌)
+   - Templates for verified, cannot_verify, and problems_found cases
+
+3. **Tool Selection Guide** (`tool_selection_guide`)
+   - Decision tree for selecting the right MCP tool
+   - Scenario-specific guidance for different verification contexts
+
+4. **Common Keywords Reference** (`common_keywords_reference`)
+   - Reference of keywords that trigger charity verification
+   - Intent recognition patterns for AI assistants
+
+5. **AI Assistant Best Practices** (`ai_assistant_best_practices`)
+   - Comprehensive best practices for using the charity verification system
+   - Guidelines for communication, error handling, and user experience
+
+### Using Prompts
+
+AI assistants can access these prompts through the MCP protocol:
+
+```json
+{
+  "method": "prompts/get",
+  "params": {
+    "name": "basic_legitimacy_workflow",
+    "arguments": {
+      "verification_type": "organization_name",
+      "organization_name": "American Red Cross"
+    }
+  }
+}
+```
+
 ## Usage with MCP Clients
 
 ### Claude Desktop
@@ -191,6 +258,7 @@ The server implements the standard MCP protocol and works with any compatible cl
 src/
 ├── config/          # Configuration management
 ├── formatting/      # Response formatting utilities
+├── prompts/         # MCP prompt implementations and templates
 ├── schemas/         # Zod validation schemas
 ├── services/        # External API clients and rate limiting
 ├── tools/           # MCP tool implementations
@@ -281,6 +349,28 @@ Default rate limits:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Prompt Examples & Usage
+
+For AI assistants using this MCP server, see our comprehensive prompt guides:
+
+- **[Verification Prompts Guide](docs/verification-prompts.md)** - Detailed workflows and examples for charity verification
+- **[Quick Reference](docs/quick-prompts-reference.md)** - Fast lookup templates and best practices
+
+### Example Verification Prompts
+
+**Basic Legitimacy Check:**
+- "Is the American Red Cross a real charity registered with the IRS?"
+- "Verify that organization with EIN 13-1837418 is legitimate"
+- "Quick check: is EIN 52-1693387 a legitimate public charity?"
+
+**Suspicious Organization Verification:**
+- "I got a donation request from 'Help Kids Foundation' - are they legitimate?"
+- "Someone is collecting money for hurricane relief - EIN 12-3456789. Is it real?"
+
+**Location-Specific Verification:**
+- "Is there a legitimate charity called 'Local Food Bank' in Chicago, IL?"
+- "Verify 'Animal Rescue' operating in California"
 
 ## Support
 

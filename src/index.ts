@@ -8,6 +8,7 @@ import { RateLimiter } from './services/rate-limiter.js';
 import { logger } from './utils/logger.js';
 import { setupErrorHandlers, handleMCPError } from './utils/error-handler.js';
 import { registerAllTools } from './tools/index.js';
+import { registerAllPrompts } from './prompts/index.js';
 
 // Global instances
 let charityAPIClient: CharityAPIClient;
@@ -96,9 +97,12 @@ function registerCharityTools() {
     // Register all charity-related tools
     registerAllTools(server);
     
-    logger.info("Charity tools registered successfully");
+    // Register all charity-related prompts
+    registerAllPrompts(server);
+    
+    logger.info("Charity tools and prompts registered successfully");
   } catch (error) {
-    logger.error("Failed to register charity tools", error);
+    logger.error("Failed to register charity tools and prompts", error);
     throw error;
   }
 }

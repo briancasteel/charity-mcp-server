@@ -5,7 +5,9 @@
 ### Layered Architecture
 ```
 ┌─────────────────┐
-│   MCP Protocol  │ ← Tool registration, request handling
+│   MCP Protocol  │ ← Tool/prompt registration, request handling
+├─────────────────┤
+│   Prompts       │ ← Template system, parameter substitution
 ├─────────────────┤
 │   Validation    │ ← Input sanitization, schema validation
 ├─────────────────┤
@@ -18,8 +20,9 @@
 ```
 
 ### Core Components
-- **MCP Server**: Protocol handler and tool registry
+- **MCP Server**: Protocol handler and tool/prompt registry
 - **Tools**: Individual charity lookup/search implementations
+- **Prompts**: Template-based prompt system with parameter validation
 - **Services**: CharityAPI client and rate limiter
 - **Validation**: Input sanitization and Zod schemas
 - **Utils**: Logging, error handling, configuration
@@ -53,7 +56,32 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 })
 ```
 
-### 3. Service Layer Abstraction
+### 3. Prompt Registration Pattern
+**Pattern**: Centralized prompt registration with template handlers
+**Location**: `src/prompts/index.ts`
+**Implementation**:
+```typescript
+server.setRequestHandler(ListPromptsRequestSchema, async () => ({
+  prompts: [...VERIFICATION_PROMPTS, ...QUICK_REFERENCE_PROMPTS]
+}))
+
+server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+  const { name, arguments: args } = request.params
+  // Route to appropriate prompt handler based on name
+  return await handlePromptGeneration(name, args)
+})
+```
+
+### 4. Template System Pattern
+**Pattern**: Modular prompt templates with parameter substitution
+**Location**: `src/prompts/verification-prompts.ts`, `src/prompts/quick-reference-prompts.ts`
+**Benefits**:
+- Reusable prompt templates
+- Type-safe parameter validation
+- Dynamic content generation
+- Consistent prompt structure
+
+### 5. Service Layer Abstraction
 **Pattern**: External API calls abstracted behind service classes
 **Location**: `src/services/charity-api.ts`
 **Benefits**: 
@@ -62,7 +90,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 - Error handling standardization
 - Configuration centralization
 
-### 4. Rate Limiting Strategy
+### 6. Rate Limiting Strategy
 **Pattern**: Token bucket algorithm with automatic cleanup
 **Location**: `src/services/rate-limiter.ts`
 **Implementation**:
@@ -89,6 +117,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 **Usage**: Global logger, rate limiter, API client instances
 **Location**: Exported from `src/index.ts`
 
+### 5. Builder Pattern
+**Usage**: Prompt template construction with dynamic parameters
+**Example**: Prompt templates built with parameter substitution and context
+
+### 6. Command Pattern
+**Usage**: Prompt handlers encapsulate template generation logic
+**Example**: Each prompt type has dedicated handler with consistent interface
+
 ## Component Relationships
 
 ### Tool → Service Flow
@@ -104,6 +140,21 @@ CharityAPI Client
 Charity Transformer
     ↓ (formats response)
 Response Formatter
+```
+
+### Prompt → Template Flow
+```
+Prompt Handler
+    ↓ (validates parameters)
+Parameter Validator
+    ↓ (selects template)
+Template Selector
+    ↓ (substitutes parameters)
+Template Engine
+    ↓ (formats prompt)
+Prompt Formatter
+    ↓ (returns to client)
+Generated Prompt
 ```
 
 ### Error Handling Chain
@@ -130,13 +181,22 @@ MCP Response
 6. **Response Format**: Structured response for AI consumption
 7. **Error Handling**: Graceful error formatting at each step
 
-### 2. Configuration Path
+### 2. Prompt Generation Path
+1. **Request Reception**: MCP server receives prompt request
+2. **Template Selection**: Identify appropriate prompt template
+3. **Parameter Validation**: Validate and sanitize input parameters
+4. **Template Processing**: Substitute parameters into template
+5. **Prompt Generation**: Create formatted prompt with context
+6. **Response Format**: Return generated prompt to client
+7. **Error Handling**: Template errors → user-friendly messages
+
+### 3. Configuration Path
 1. **Environment Loading**: dotenv loads .env file
 2. **Config Validation**: Zod schemas validate configuration
 3. **Client Initialization**: API client created with validated config
 4. **Server Startup**: All components initialized before accepting requests
 
-### 3. Error Recovery Path
+### 4. Error Recovery Path
 1. **Error Detection**: Try/catch blocks in all async operations
 2. **Error Classification**: Network, validation, API, or system errors
 3. **User-Friendly Messages**: Technical errors → helpful descriptions
@@ -146,7 +206,8 @@ MCP Response
 ## Code Organization Principles
 
 ### 1. Separation of Concerns
-- Tools handle MCP protocol specifics
+- Tools handle MCP protocol specifics for data operations
+- Prompts handle template generation and user experience
 - Services handle external integrations
 - Validation handles input sanitization
 - Formatting handles output standardization
@@ -155,17 +216,26 @@ MCP Response
 - Services injected into tools (testability)
 - Configuration injected into services
 - Logger injected throughout application
+- Template handlers injected into prompt system
 
 ### 3. Type Safety
 - TypeScript strict mode enabled
 - Zod runtime validation matches compile-time types
 - No `any` types used
 - Comprehensive error types defined
+- Prompt parameter validation with type safety
 
 ### 4. Testability
 - Service layer can be mocked
 - Pure functions for transformations
 - Dependency injection enables unit testing
 - Test files co-located with implementation
+- Prompt templates independently testable
 
-This architecture ensures maintainability, testability, and reliability while providing clean separation of concerns and type safety throughout.
+### 5. Template Architecture
+- Modular prompt templates with parameter substitution
+- Consistent template structure across all prompt types
+- Dynamic content generation based on parameters
+- Reusable components for common patterns
+
+This comprehensive architecture ensures maintainability, testability, and reliability while providing clean separation of concerns, type safety, and enhanced user experience through advanced prompt templating.
