@@ -2,7 +2,7 @@
 
 A comprehensive [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that provides AI assistants with enterprise-grade access to charity and nonprofit organization data from the IRS database. This feature-complete server enables AI tools to look up charity information, verify tax-deductible status, search for nonprofit organizations, and utilize advanced prompt templates for guided charity research workflows.
 
-## 🎯 Project Status: Feature Complete (January 2025)
+## 🎯 Project Status: Feature Complete
 
 **Achievement**: 100% complete implementation exceeding all original requirements
 - ✅ All 4 core MCP tools with comprehensive error handling
