@@ -5,7 +5,7 @@ import { logger } from "../utils/logger.js";
 import { handleMCPError, CharityAPIError } from "../utils/error-handler.js";
 
 export const CHARITY_SEARCH_TOOL = {
-  name: "Charity Search",
+  name: "charity-search",
   description: `
     Search for charities and nonprofit organizations in the IRS database.
     You can search by organization name, location, or combine multiple criteria.

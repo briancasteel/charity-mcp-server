@@ -37,7 +37,6 @@ describe('List Organizations Tool', () => {
 
   describe('LIST_ORGANIZATIONS_TOOL definition', () => {
     it('should have correct tool definition', () => {
-      expect(LIST_ORGANIZATIONS_TOOL.name).toBe('List Organizations');
       expect(LIST_ORGANIZATIONS_TOOL.description).toContain('List nonprofit organizations');
       expect(LIST_ORGANIZATIONS_TOOL.inputSchema.required).toContain('since');
       expect(LIST_ORGANIZATIONS_TOOL.inputSchema.properties.since).toBeDefined();

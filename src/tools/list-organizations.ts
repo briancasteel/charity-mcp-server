@@ -5,7 +5,7 @@ import { logger } from "../utils/logger.js";
 import { handleMCPError, CharityAPIError } from "../utils/error-handler.js";
 
 export const LIST_ORGANIZATIONS_TOOL = {
-  name: "List Organizations",
+  name: "list-organizations",
   description: `
     List nonprofit organizations from the IRS database that have been updated since a specified date.
     This tool retrieves organizations that have had changes to their tax-exempt status or filing information.
